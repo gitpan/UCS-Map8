@@ -1,0 +1,140 @@
+# Unicode-Map8
+
+perl Makefile.PL
+Checking if your kit is complete...
+Looks good
+Writing Makefile.mk for Unicode::Map8
+
+dmake -n dynamic -f Makefile.mk > mymake.out
+
+perl -I:::lib: :::lib:ExtUtils:xsubpp -noprototypes Map8.xs >xstmp.c && Rename -y xstmp.c :Map8.c
+
+Set SrcPPC ":Map8.c :map8x.c"
+
+MWCPPC -nosyspath -sym on -d MULTIPLICITY -relax_pointers -i- -i : ¶
+-i "::::sfio:"include: ¶
+-i "::::GUSI:"include: ¶
+-i "Tallinn:Metrowerks:CodeWarrior¶ MPW:Interfaces&Libraries:Interfaces:MWCIncludes:" ¶
+-d PERL -i ::: -i- -i : -w off -traceback -opt all -t -ext .PPC.o {SrcPPC} -o :Obj:
+
+Time to compile 'Map8.c': 17.67 seconds
+Time to compile 'map8x.c': 27.10 seconds
+
+perl "-I:::lib:" -e 'use ExtUtils::Mksymlists; Mksymlists("NAME" => "Unicode::Map8", "DL_FUNCS" => {  }, "DL_VARS" => []);'
+
+MWLinkPPC -xm sharedlibrary -sym on -msg nodup -@export Map8.exp -name Map8 ¶
+-o Map8.shlb.PPC :Obj:Map8.c.PPC.o :Obj:map8x.c.PPC.o "{MWPPCLibraries}MathLib"	¶
+:::PerlStub ¶
+"{MWPPCLibraries}InterfaceLib" ¶
+"{MWPPCLibraries}MSL RuntimePPC.Lib" ¶
+"{MWPPCLibraries}MSL C.PPC.Lib"
+
+Set SrcCFM68K ":Map8.c :map8x.c"
+
+MWC68K -nosyspath -sym on -d MULTIPLICITY -relax_pointers -i- -i : ¶
+-i "::::sfio:"include: -i "::::GUSI:"include: ¶
+-i "Tallinn:Metrowerks:CodeWarrior¶ MPW:Interfaces&Libraries:Interfaces:MWCIncludes:" ¶
+-d PERL -i ::: -i- -i : -w off -indirect -mc68020 -model CFMflatdf ¶
+-pragma "export on" -model far -opt off -t -ext .CFM68K.o {SrcCFM68K} -o :Obj:
+
+Time to compile 'Map8.c': 16.33 seconds
+Time to compile 'map8x.c': 22.10 seconds
+
+MWLink68K -xm sharedlibrary -sym on -msg nodup -@export Map8.exp -name Map8 ¶
+-o Map8.shlb.CFM68K :Obj:Map8.c.CFM68K.o :Obj:map8x.c.CFM68K.o ¶
+"{MW68KLibraries}MathLibCFM68K Fa(4i_8d).Lib" ¶
+:::PerlStub ¶
+"{MW68KLibraries}InterfaceLib" ¶
+"{MW68KLibraries}MSL C.CFM68K Fa(4i_8d).Lib" ¶
+"{MW68KLibraries}MSL MWRuntimeLibCFM68K" ¶
+"{MW68KLibraries}MSL ShLibRuntimeCFM68K.Lib"
+
+# installation
+dmake -n install_dynamic -f Makefile.mk > install.out
+
+:::InstallBLIB "Unicode::Map8" "perl -e 'use File::Path; mkpath(\@ARGV, 1);'" Map8.pm Map8.xs
+
+Skipping :Map8.xs, which doesn't contain any pod.
+mkdir :blib
+mkdir :blib:lib
+mkdir :blib:lib:Unicode:
+
+perl -e 'use File::Path; mkpath(\@ARGV, 1);' :blib:lib:MacPPC:auto:Unicode:Map8: :blib:lib:MacCFM68K:auto:Unicode:Map8:
+
+mkdir :blib:lib:MacPPC
+mkdir :blib:lib:MacPPC:auto
+mkdir :blib:lib:MacPPC:auto:Unicode
+mkdir :blib:lib:MacPPC:auto:Unicode:Map8:
+mkdir :blib:lib:MacCFM68K
+mkdir :blib:lib:MacCFM68K:auto
+mkdir :blib:lib:MacCFM68K:auto:Unicode
+mkdir :blib:lib:MacCFM68K:auto:Unicode:Map8:
+
+Duplicate -y Map8.shlb.PPC :blib:lib:MacPPC:auto:Unicode:Map8:Map8
+Duplicate -y Map8.shlb.CFM68K :blib:lib:MacCFM68K:auto:Unicode:Map8:Map8
+
+# don't normally have to do this
+NewFolder :blib:lib:Unicode:Map8
+NewFolder :blib:lib:Unicode:Map8:maps
+Duplicate -y :Map8:maps:Å :blib:lib:Unicode:Map8:maps
+
+# testing (note that Unicode-String-2.04 already installed in site_perl)
+Files t
+perl -I ':blib:lib' :t:callback.t
+1..2
+ok 1
+ok 2
+
+perl -I ':blib:lib' :t:compat.t
+1..2
+ok 1
+ok 2
+
+perl -I ':blib:lib' :t:map8.t
+1..18
+MAPS_DIR = :blib:lib:Unicode:Map8:maps
+ok 1
+ok 2
+ok 3
+0x20 0x0020
+0x44 0x0394
+0xA0 0x0020
+# BLOCK 0
+0x0020 0x20
+0x00A0 0x20
+# BLOCK 3
+0x0394 0x44
+ok 4
+ok 5
+ok 6
+ok 7
+ok 8
+ok 9
+---
+ok 10
+ok 11
+ok 12
+ok 13
+ok 14
+ok 15
+0x01 0x0001
+0x02 0x0003
+0x03 0x0033
+0xAB 0xABCD
+# BLOCK 0
+0x0001 0x01
+0x0003 0x02
+0x0033 0x03
+# BLOCK 171
+0xABCD 0xAB
+ok 16
+ok 17
+ok 18
+
+perl -I ':blib:lib' :t:unistr.t
+1..2
+ok 1
+U+03b6 U+03c8 U+03b5
+<GREEK SMALL LETTER ZETA> <GREEK SMALL LETTER PSI> <GREEK SMALL LETTER EPSILON>
+ok 2
+
